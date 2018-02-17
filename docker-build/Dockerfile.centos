@@ -1,0 +1,23 @@
+FROM centos:7
+RUN yum update -y && yum install -y \
+  autoconf \
+  automake \
+  bc \
+  bison \
+  curl \
+  expat-devel \
+  expect \
+  flex \
+  gawk \
+  gcc-c++ \
+  gmp-devel \
+  libtool \
+  make \
+  mpc-devel \
+  mpfr-devel \
+  patchutils \
+  rsync \
+  rpm-build \
+  texinfo \
+  zlib-devel
+WORKDIR /usr/src/app

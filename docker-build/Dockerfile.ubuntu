@@ -1,0 +1,21 @@
+FROM ubuntu:16.04
+RUN apt-get update && apt-get install -y \
+  autoconf \
+  automake \
+  bc \
+  bison \
+  curl \
+  expect \
+  flex \
+  gawk \
+  g++ \
+  libexpat-dev \
+  libgmp-dev \
+  libmpc-dev \
+  libmpfr-dev \
+  libtool \
+  make \
+  patchutils \
+  texinfo \
+  zlib1g-dev
+WORKDIR /usr/src/app
