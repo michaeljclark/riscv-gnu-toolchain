@@ -25,13 +25,13 @@ export PATH=${PATH}:${RISCV}/bin
 
 ## Package files
 
-Ubuntu RISC-V toolchain packages for the version `2018.1-1`:
+Ubuntu RISC-V multilib toolchain packages for the version `2018.1-1`:
 
 - `riscv-tools-2018.1-toolchain-common_2018.1-1_amd64.deb`
 - `riscv-tools-2018.1-toolchain-newlib_2018.1-1_amd64.deb`
 - `riscv-tools-2018.1-toolchain-linux_2018.1-1_amd64.deb`
 
-CentOS RISC-V toolchain packages for the version `2018.1-1`:
+CentOS RISC-V multilib toolchain packages for the version `2018.1-1`:
 
 - `riscv-tools-2018.1-toolchain-common-2018.1-1.x86_64.rpm`
 - `riscv-tools-2018.1-toolchain-newlib-2018.1-1.x86_64.rpm`
@@ -40,11 +40,13 @@ CentOS RISC-V toolchain packages for the version `2018.1-1`:
 ## Docker build
 
 The packages are created using docker containers so that the build process
-is agnostic to the host operating system.
+is agnostic to the host operating system. The package build script
+builds a multilib Newlib toolchain and a multilib Linux toolchain and then
+factors the common files into a toolchain-common package.
 
 ### Creating Ubuntu packages for the Newlib and Linux toolchains:
 
-Execute the current commands from the `riscv-gnu-toolchain` top-level directory:
+Execute these commands from the `riscv-gnu-toolchain` top-level directory:
 
 ```
 docker build -f docker-build/Dockerfile.ubuntu -t toolchain-ubuntu docker-build/
@@ -54,7 +56,7 @@ docker run --rm -e PACKAGE_VERSION=2018.1-1 -v $(pwd):/usr/src/app \
 
 ### Creating CentOS packages for the Newlib and Linux toolchains:
 
-Execute the current commands from the `riscv-gnu-toolchain` top-level directory:
+Execute these commands from the `riscv-gnu-toolchain` top-level directory:
 
 ```
 docker build -f docker-build/Dockerfile.centos -t toolchain-centos docker-build/
