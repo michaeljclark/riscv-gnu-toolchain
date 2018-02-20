@@ -144,6 +144,7 @@ create_deb()
     pkg_desc=$1
     pkg_name=$2
     pkg_dir=$3
+    pkg_depends=$4
 
     echo "=== creating ${pkg_dir}.deb ==="
 
@@ -154,6 +155,7 @@ Version: ${pkg_version}-${pkg_release}
 Architecture: ${pkg_arch}
 Description: ${pkg_desc}
 Maintainer: sw-dev@groups.riscv.org
+${pkg_depends}
 EOF
 
     dpkg-deb --build ${pkg_dir}
@@ -164,6 +166,7 @@ create_rpm()
     pkg_desc=$1
     pkg_name=$2
     pkg_dir=$3
+    pkg_requires=$4
 
     echo "=== creating ${pkg_dir}.rpm ==="
     
@@ -173,6 +176,7 @@ Version: ${pkg_version}
 Release: ${pkg_release}
 Summary: ${pkg_desc}
 License: GPL
+${pkg_requires}
 %define __os_install_post %{nil}
 %define _unpackaged_files_terminate_build 0
 %description
@@ -200,21 +204,27 @@ EOF
 if [ "${pkg_type}" = "rpm" ]; then
     create_rpm "RISC-V GNU Compiler Toolchain Common" \
 	       ${pkg_toolchain_common} \
-	       ${stage_toolchain_common_dir}
+	       ${stage_toolchain_common_dir} \
+	       "Requires: python >= 2.7.5"
     create_rpm "RISC-V GNU Compiler Toolchain Newlib" \
 	       ${pkg_toolchain_newlib} \
-	       ${stage_toolchain_newlib_dir}
+	       ${stage_toolchain_newlib_dir} \
+	       "Requires: ${pkg_toolchain_common} = ${pkg_version}-${pkg_release}"
     create_rpm "RISC-V GNU Compiler Toolchain Linux"  \
 	       ${pkg_toolchain_linux} \
-	       ${stage_toolchain_linux_dir}
+	       ${stage_toolchain_linux_dir} \
+	       "Requires: ${pkg_toolchain_common} = ${pkg_version}-${pkg_release}"
 elif [ "${pkg_type}" = "deb" ]; then
     create_deb "RISC-V GNU Compiler Toolchain Common" \
 	       ${pkg_toolchain_common} \
-	       ${stage_toolchain_common_dir}
+	       ${stage_toolchain_common_dir} \
+	       "Depends: python (>= 2.7.5)"
     create_deb "RISC-V GNU Compiler Toolchain Newlib" \
 	       ${pkg_toolchain_newlib} \
-	       ${stage_toolchain_newlib_dir}
+	       ${stage_toolchain_newlib_dir} \
+	       "Depends: ${pkg_toolchain_common} (= ${pkg_version}-${pkg_release})"
     create_deb "RISC-V GNU Compiler Toolchain Linux"  \
 	       ${pkg_toolchain_linux} \
-	       ${stage_toolchain_linux_dir}    
+	       ${stage_toolchain_linux_dir} \
+	       "Depends: ${pkg_toolchain_common} (= ${pkg_version}-${pkg_release})"
 fi
