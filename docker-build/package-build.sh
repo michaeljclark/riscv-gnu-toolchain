@@ -2,8 +2,6 @@
 
 set -e
 
-PRESERVE=yes
-
 if [ ! -f /etc/os-release ]; then
     echo "/etc/os-release is not present"
     exit 1
