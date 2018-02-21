@@ -176,6 +176,7 @@ Version: ${pkg_version}
 Release: ${pkg_release}
 Summary: ${pkg_desc}
 License: GPL
+AutoReqProv: no
 ${pkg_requires}
 %define __os_install_post %{nil}
 %define _unpackaged_files_terminate_build 0
