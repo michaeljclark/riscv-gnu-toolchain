@@ -19,23 +19,23 @@ that one PATH entry will make available all tools associated with a
 major release. Example directory prefix for the version `2018.1-1`:
 
 ```
-export RISCV=/opt/riscv/tools/2018.1
+export RISCV=/opt/SiFive/SDK/2018.1
 export PATH=${PATH}:${RISCV}/bin
 ```
 
 ## Package files
 
-Ubuntu RISC-V multilib toolchain packages for the version `2018.1-1`:
+SiFive Ubuntu multilib toolchain packages for the version `2018.1-1`:
 
-- `riscv-tools-2018.1-toolchain-common_2018.1-1_amd64.deb`
-- `riscv-tools-2018.1-toolchain-newlib_2018.1-1_amd64.deb`
-- `riscv-tools-2018.1-toolchain-linux_2018.1-1_amd64.deb`
+- `sifive-sdk-2018.1-gcc-common_2018.1-1_amd64.deb`
+- `sifive-sdk-2018.1-gcc-newlib_2018.1-1_amd64.deb`
+- `sifive-sdk-2018.1-gcc-linux_2018.1-1_amd64.deb`
 
-CentOS RISC-V multilib toolchain packages for the version `2018.1-1`:
+SiFive CentOS multilib toolchain packages for the version `2018.1-1`:
 
-- `riscv-tools-2018.1-toolchain-common-2018.1-1.x86_64.rpm`
-- `riscv-tools-2018.1-toolchain-newlib-2018.1-1.x86_64.rpm`
-- `riscv-tools-2018.1-toolchain-linux-2018.1-1.x86_64.rpm`
+- `sifive-sdk-2018.1-gcc-common-2018.1-1.x86_64.rpm`
+- `sifive-sdk-2018.1-gcc-newlib-2018.1-1.x86_64.rpm`
+- `sifive-sdk-2018.1-gcc-linux-2018.1-1.x86_64.rpm`
 
 ## Docker build
 

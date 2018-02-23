@@ -35,45 +35,45 @@ fi
 pkg_version=$(echo ${PACKAGE_VERSION} | cut -d- -f1)
 pkg_release=$(echo ${PACKAGE_VERSION} | cut -d- -f2)
 
-pkg_prefix=/opt/riscv/tools/${pkg_version}
+pkg_prefix=/opt/SiFive/SDK/${pkg_version}
 pkg_suffix=${suffix_sep}${pkg_version}-${pkg_release}${arch_sep}${pkg_arch}
 
-pkg_toolchain_linux=riscv-tools-${pkg_version}-toolchain-linux
-pkg_toolchain_newlib=riscv-tools-${pkg_version}-toolchain-newlib
-pkg_toolchain_common=riscv-tools-${pkg_version}-toolchain-common
+pkg_gcc_linux=sifive-sdk-${pkg_version}-gcc-linux
+pkg_gcc_newlib=sifive-sdk-${pkg_version}-gcc-newlib
+pkg_gcc_common=sifive-sdk-${pkg_version}-gcc-common
 
 #
 # build toolchains
 #
 
-build_toolchain_newlib_dir=/usr/src/app/${pkg_toolchain_newlib}${pkg_suffix}.build
-build_toolchain_linux_dir=/usr/src/app/${pkg_toolchain_linux}${pkg_suffix}.build
+build_gcc_newlib_dir=/usr/src/app/${pkg_gcc_newlib}${pkg_suffix}.build
+build_gcc_linux_dir=/usr/src/app/${pkg_gcc_linux}${pkg_suffix}.build
 
 # build newlib toolchain
-if [ ! -d ${build_toolchain_newlib_dir} -o ! "$PRESERVE" = "yes" ]; then
-    echo "=== building newlib toolchain to $(basename ${build_toolchain_newlib_dir}) ==="
-    rm -fr ${build_toolchain_newlib_dir}
+if [ ! -d ${build_gcc_newlib_dir} -o ! "$PRESERVE" = "yes" ]; then
+    echo "=== building newlib gcc to $(basename ${build_gcc_newlib_dir}) ==="
+    rm -fr ${build_gcc_newlib_dir}
     ./configure --enable-multilib \
 		--with-cmodel=medany \
-		--prefix=${build_toolchain_newlib_dir}${pkg_prefix}
+		--prefix=${build_gcc_newlib_dir}${pkg_prefix}
     make clean
     make -j$(nproc)
 fi
 
 # build linux toolchain
-if [ ! -d ${build_toolchain_linux_dir} -o ! "$PRESERVE" = "yes" ]; then
-    echo "=== building linux toolchain to $(basename ${build_toolchain_linux_dir}) ==="
-    rm -fr ${build_toolchain_linux_dir}
+if [ ! -d ${build_gcc_linux_dir} -o ! "$PRESERVE" = "yes" ]; then
+    echo "=== building linux gcc to $(basename ${build_gcc_linux_dir}) ==="
+    rm -fr ${build_gcc_linux_dir}
     ./configure --enable-linux \
 		--enable-multilib \
 		--with-cmodel=medany \
-		--prefix=${build_toolchain_linux_dir}${pkg_prefix}
+		--prefix=${build_gcc_linux_dir}${pkg_prefix}
     make clean
     make -j$(nproc)
 fi
 
 # strip executables
-for pkg_dir in ${build_toolchain_newlib_dir} ${build_toolchain_linux_dir}; do
+for pkg_dir in ${build_gcc_newlib_dir} ${build_gcc_linux_dir}; do
     echo "=== striping executables in $(basename ${pkg_dir}) ==="
     strip ${pkg_dir}/${pkg_prefix}/bin/*
     strip ${pkg_dir}/${pkg_prefix}/libexec/gcc/*/*/cc1
@@ -85,29 +85,29 @@ done
 # package staging directories
 #
 
-stage_toolchain_common_dir=/usr/src/app/${pkg_toolchain_common}${pkg_suffix}
-stage_toolchain_newlib_dir=/usr/src/app/${pkg_toolchain_newlib}${pkg_suffix}
-stage_toolchain_linux_dir=/usr/src/app/${pkg_toolchain_linux}${pkg_suffix}
+stage_gcc_common_dir=/usr/src/app/${pkg_gcc_common}${pkg_suffix}
+stage_gcc_newlib_dir=/usr/src/app/${pkg_gcc_newlib}${pkg_suffix}
+stage_gcc_linux_dir=/usr/src/app/${pkg_gcc_linux}${pkg_suffix}
 
 # build package file lists
 
-echo "=== finding common files between $(basename ${build_toolchain_newlib_dir}) and $(basename ${build_toolchain_linux_dir}) ==="
-( cd ${build_toolchain_newlib_dir} && find . -type f -o -type l | sed 's#\.\/#/#' ) \
-    > ${build_toolchain_newlib_dir}.list
-( cd ${build_toolchain_linux_dir} && find . -type f -o -type l | sed 's#\.\/#/#' ) \
-    > ${build_toolchain_linux_dir}.list
+echo "=== finding common files between $(basename ${build_gcc_newlib_dir}) and $(basename ${build_gcc_linux_dir}) ==="
+( cd ${build_gcc_newlib_dir} && find . -type f -o -type l | sed 's#\.\/#/#' ) \
+    > ${build_gcc_newlib_dir}.list
+( cd ${build_gcc_linux_dir} && find . -type f -o -type l | sed 's#\.\/#/#' ) \
+    > ${build_gcc_linux_dir}.list
 
-echo "=== creating $(basename ${stage_toolchain_common_dir}.list) ==="
-cat ${build_toolchain_newlib_dir}.list ${build_toolchain_linux_dir}.list \
-    | sort | uniq -d > ${stage_toolchain_common_dir}.list
+echo "=== creating $(basename ${stage_gcc_common_dir}.list) ==="
+cat ${build_gcc_newlib_dir}.list ${build_gcc_linux_dir}.list \
+    | sort | uniq -d > ${stage_gcc_common_dir}.list
 
-echo "=== creating $(basename ${stage_toolchain_newlib_dir}.list) ==="
-cat ${build_toolchain_newlib_dir}.list ${stage_toolchain_common_dir}.list \
-    | sort | uniq -u > ${stage_toolchain_newlib_dir}.list
+echo "=== creating $(basename ${stage_gcc_newlib_dir}.list) ==="
+cat ${build_gcc_newlib_dir}.list ${stage_gcc_common_dir}.list \
+    | sort | uniq -u > ${stage_gcc_newlib_dir}.list
 
-echo "=== creating $(basename ${stage_toolchain_linux_dir}.list) ==="
-cat ${build_toolchain_linux_dir}.list ${stage_toolchain_common_dir}.list \
-    | sort | uniq -u > ${stage_toolchain_linux_dir}.list
+echo "=== creating $(basename ${stage_gcc_linux_dir}.list) ==="
+cat ${build_gcc_linux_dir}.list ${stage_gcc_common_dir}.list \
+    | sort | uniq -u > ${stage_gcc_linux_dir}.list
 
 # create staging directories
 
@@ -129,9 +129,9 @@ create_stage_directory()
     done
 }
 
-create_stage_directory ${build_toolchain_newlib_dir} ${stage_toolchain_common_dir} ${stage_toolchain_common_dir}.list
-create_stage_directory ${build_toolchain_newlib_dir} ${stage_toolchain_newlib_dir} ${stage_toolchain_newlib_dir}.list
-create_stage_directory ${build_toolchain_linux_dir} ${stage_toolchain_linux_dir} ${stage_toolchain_linux_dir}.list
+create_stage_directory ${build_gcc_newlib_dir} ${stage_gcc_common_dir} ${stage_gcc_common_dir}.list
+create_stage_directory ${build_gcc_newlib_dir} ${stage_gcc_newlib_dir} ${stage_gcc_newlib_dir}.list
+create_stage_directory ${build_gcc_linux_dir} ${stage_gcc_linux_dir} ${stage_gcc_linux_dir}.list
 
 #
 # create packages
@@ -152,7 +152,7 @@ Package: ${pkg_name}
 Version: ${pkg_version}-${pkg_release}
 Architecture: ${pkg_arch}
 Description: ${pkg_desc}
-Maintainer: sw-dev@groups.riscv.org
+Maintainer: support@sifive.com
 ${pkg_depends}
 EOF
 
@@ -201,29 +201,29 @@ EOF
 }
 
 if [ "${pkg_type}" = "rpm" ]; then
-    create_rpm "RISC-V GNU Compiler Toolchain Common" \
-	       ${pkg_toolchain_common} \
-	       ${stage_toolchain_common_dir} \
+    create_rpm "RISC-V GNU Compiler Common" \
+	       ${pkg_gcc_common} \
+	       ${stage_gcc_common_dir} \
 	       "Requires: python >= 2.7.5"
-    create_rpm "RISC-V GNU Compiler Toolchain Newlib" \
-	       ${pkg_toolchain_newlib} \
-	       ${stage_toolchain_newlib_dir} \
-	       "Requires: ${pkg_toolchain_common} = ${pkg_version}-${pkg_release}"
-    create_rpm "RISC-V GNU Compiler Toolchain Linux"  \
-	       ${pkg_toolchain_linux} \
-	       ${stage_toolchain_linux_dir} \
-	       "Requires: ${pkg_toolchain_common} = ${pkg_version}-${pkg_release}"
+    create_rpm "RISC-V GNU Compiler Newlib" \
+	       ${pkg_gcc_newlib} \
+	       ${stage_gcc_newlib_dir} \
+	       "Requires: ${pkg_gcc_common} = ${pkg_version}-${pkg_release}"
+    create_rpm "RISC-V GNU Compiler Linux"  \
+	       ${pkg_gcc_linux} \
+	       ${stage_gcc_linux_dir} \
+	       "Requires: ${pkg_gcc_common} = ${pkg_version}-${pkg_release}"
 elif [ "${pkg_type}" = "deb" ]; then
-    create_deb "RISC-V GNU Compiler Toolchain Common" \
-	       ${pkg_toolchain_common} \
-	       ${stage_toolchain_common_dir} \
+    create_deb "RISC-V GNU Compiler Common" \
+	       ${pkg_gcc_common} \
+	       ${stage_gcc_common_dir} \
 	       "Depends: python (>= 2.7.5)"
-    create_deb "RISC-V GNU Compiler Toolchain Newlib" \
-	       ${pkg_toolchain_newlib} \
-	       ${stage_toolchain_newlib_dir} \
-	       "Depends: ${pkg_toolchain_common} (= ${pkg_version}-${pkg_release})"
-    create_deb "RISC-V GNU Compiler Toolchain Linux"  \
-	       ${pkg_toolchain_linux} \
-	       ${stage_toolchain_linux_dir} \
-	       "Depends: ${pkg_toolchain_common} (= ${pkg_version}-${pkg_release})"
+    create_deb "RISC-V GNU Compiler Newlib" \
+	       ${pkg_gcc_newlib} \
+	       ${stage_gcc_newlib_dir} \
+	       "Depends: ${pkg_gcc_common} (= ${pkg_version}-${pkg_release})"
+    create_deb "RISC-V GNU Compiler Linux"  \
+	       ${pkg_gcc_linux} \
+	       ${stage_gcc_linux_dir} \
+	       "Depends: ${pkg_gcc_common} (= ${pkg_version}-${pkg_release})"
 fi
